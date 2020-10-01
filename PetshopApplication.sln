@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Petshop.Core", "Petshop.Cor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Petshop.Core.Enteties", "Core.Enteties\Petshop.Core.Enteties.csproj", "{C7F0F5A2-3B14-4F46-8A8A-2998D21D2527}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Petshop.Infrastructure.Data", "Petshop.Infrastructure.Data\Petshop.Infrastructure.Data.csproj", "{9C7D887C-A46D-4937-ADAF-C820C86C1C51}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Petshop.Infrastructure.Static.Data", "Petshop.Infrastructure.Data\Petshop.Infrastructure.Static.Data.csproj", "{9C7D887C-A46D-4937-ADAF-C820C86C1C51}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Petshop.RestAPI.UI", "Petshop.API.UI\Petshop.RestAPI.UI.csproj", "{4FAC915C-A6DA-41F2-A7C6-A7F8473FF9C5}"
 EndProject
@@ -16,6 +16,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{B71603BE-27CD-4036-9CF9-DF9AC718D0D0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{5EAA3745-FF0A-419E-B098-0C3D2D5BA73D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Petshop.Infrastructure.Data", "Petshop.Infrastructure.SQLData\Petshop.Infrastructure.Data.csproj", "{23ADA254-2597-4295-A0DD-5E619AEC7C4B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{4FAC915C-A6DA-41F2-A7C6-A7F8473FF9C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4FAC915C-A6DA-41F2-A7C6-A7F8473FF9C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4FAC915C-A6DA-41F2-A7C6-A7F8473FF9C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23ADA254-2597-4295-A0DD-5E619AEC7C4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23ADA254-2597-4295-A0DD-5E619AEC7C4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23ADA254-2597-4295-A0DD-5E619AEC7C4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23ADA254-2597-4295-A0DD-5E619AEC7C4B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -48,6 +54,7 @@ Global
 		{C7F0F5A2-3B14-4F46-8A8A-2998D21D2527} = {B71603BE-27CD-4036-9CF9-DF9AC718D0D0}
 		{9C7D887C-A46D-4937-ADAF-C820C86C1C51} = {5EAA3745-FF0A-419E-B098-0C3D2D5BA73D}
 		{4FAC915C-A6DA-41F2-A7C6-A7F8473FF9C5} = {12949C15-A428-48A8-ABA8-4A365D22653F}
+		{23ADA254-2597-4295-A0DD-5E619AEC7C4B} = {5EAA3745-FF0A-419E-B098-0C3D2D5BA73D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EEA3668B-9DD9-436D-BAD5-3D807A73544D}

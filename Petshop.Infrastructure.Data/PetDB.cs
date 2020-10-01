@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Petshop.Infrastructure.Data
+namespace Petshop.Infrastructure.Static.Data
 {
     public static class PetDB
     {

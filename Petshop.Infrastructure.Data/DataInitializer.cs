@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Petshop.Infrastructure.Data
+namespace Petshop.Infrastructure.Static.Data
 {
     public class DataInitializer
     {
