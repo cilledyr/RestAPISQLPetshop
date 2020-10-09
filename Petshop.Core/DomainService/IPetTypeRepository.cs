@@ -14,5 +14,7 @@ namespace Petshop.Core.DomainService
         public PetType UpdatePetType(PetType theNewPetType, PetType theOldPetType);
         public PetType DeletePetType(PetType toBeDeletedPetType);
         public List<Pet> FindAllPetsByType(PetType theType);
+
+        public List<PetType> FindPetTypeByIdWithPets(int id);
     }
 }

@@ -34,35 +34,27 @@ namespace Petshop.Core.ApplicationService.Impl
 
         public PetType FindPetTypeById(int id)
         {
-            List<PetType> allthePetsWithID = _petTypeRepo.FindPetTypeById(id);
-            if(allthePetsWithID.Count != 1)
+            List<PetType> alltheTypesWithID = _petTypeRepo.FindPetTypeById(id);
+            if(alltheTypesWithID.Count != 1)
             {
                 return null;
             }
             else
             {
-                return allthePetsWithID[0];
+                return alltheTypesWithID[0];
             }
         }
 
         public PetType FindPetTypeByIdWithPets(int id)
         {
-            List<PetType> foundPetType = _petTypeRepo.FindPetTypeById(id);
+            List<PetType> foundPetType = _petTypeRepo.FindPetTypeByIdWithPets(id);
             if (foundPetType.Count != 1)
             {
                 return null;
             }
             else
             {
-                PetType thePetType = foundPetType.Select(pt => new PetType()
-                {
-                    PetTypeId = pt.PetTypeId,
-                    PetTypeName = pt.PetTypeName,
-                    PetTypePets = FindAllPetsByType(pt)
-
-                }).FirstOrDefault(pt => pt.PetTypeId == id);
-
-                return thePetType;
+                return foundPetType[0];
             }
         }
 

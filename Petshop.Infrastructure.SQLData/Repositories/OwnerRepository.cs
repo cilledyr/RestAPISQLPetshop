@@ -24,17 +24,21 @@ namespace Petshop.Infrastructure.Data.Repositories
 
         public Owner DeleteOwner(Owner toBeDeletedOwner)
         {
-            throw new NotImplementedException();
+            var petsToRemove = _ctx.Pets.Where(p => p.PetOwner == toBeDeletedOwner);
+            _ctx.RemoveRange(petsToRemove);
+            var deletedOwner = _ctx.Owners.Remove(toBeDeletedOwner).Entity;
+            _ctx.SaveChanges();
+            return deletedOwner;
         }
 
         public List<Pet> FindAllPetsByOwner(Owner theOwner)
         {
-            throw new NotImplementedException();
+            return _ctx.Pets.Where(p => p.PetOwner == theOwner).ToList();
         }
 
         public List<Owner> FindOwner(int theOwnerId)
         {
-            return (List<Owner>)_ctx.Owners.Where(o => o.OwnerId == theOwnerId);
+            return _ctx.Owners.Where(o => o.OwnerId == theOwnerId).ToList();
         }
 
         public IEnumerable<Owner> FindOwnerByAddress(string searchValue)
@@ -49,7 +53,7 @@ namespace Petshop.Infrastructure.Data.Repositories
 
         public List<Owner> FindOwnerByID(int searchId)
         {
-            return (List<Owner>)_ctx.Owners.Where(o => o.OwnerId == searchId);
+            return _ctx.Owners.Where(o => o.OwnerId == searchId).ToList();
         }
 
         public IEnumerable<Owner> FindOwnerByName(string searchValue)

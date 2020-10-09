@@ -45,19 +45,8 @@ namespace Petshop.Core.ApplicationService.Impl
             }
             else
             {
-                Owner theOwner = foundOwners.Select(o => new Owner()
-                {
-                    OwnerId = o.OwnerId,
-                    OwnerFirstName = o.OwnerFirstName,
-                    OwnerLastName = o.OwnerLastName,
-                    OwnerAddress = o.OwnerAddress,
-                    OwnerPhoneNr = o.OwnerPhoneNr,
-                    OwnerEmail = o.OwnerEmail,
-                    OwnerPets = FindAllPetsByOwner(o)
-
-                }).FirstOrDefault(o => o.OwnerId == theId);
-
-                return theOwner;
+                foundOwners[0].OwnerPets = _ownerRepo.FindAllPetsByOwner(foundOwners[0]);
+                return foundOwners[0];
             }
         }
 

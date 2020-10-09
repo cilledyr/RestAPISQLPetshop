@@ -1,4 +1,5 @@
-﻿using Petshop.Core.DomainService;
+﻿using Microsoft.EntityFrameworkCore;
+using Petshop.Core.DomainService;
 using Petshop.Core.Enteties;
 using System;
 using System.Collections.Generic;
@@ -24,7 +25,11 @@ namespace Petshop.Infrastructure.Data.Repositories
 
         public PetType DeletePetType(PetType toBeDeletedPetType)
         {
-            throw new NotImplementedException();
+            var thePets = _ctx.Pets.Where(p => p.PetType == toBeDeletedPetType);
+            _ctx.RemoveRange(thePets);
+            var deletedType = _ctx.PetTypes.Remove(toBeDeletedPetType).Entity;
+            _ctx.SaveChanges();
+            return deletedType;
         }
 
         public List<Pet> FindAllPetsByType(PetType theType)
@@ -34,12 +39,17 @@ namespace Petshop.Infrastructure.Data.Repositories
 
         public List<PetType> FindPetTypeById(int id)
         {
-            return (List<PetType>)_ctx.PetTypes.Where(p => p.PetTypeId == id);
+            return _ctx.PetTypes.Where(p => p.PetTypeId == id).ToList();
+        }
+
+        public List<PetType> FindPetTypeByIdWithPets(int id)
+        {
+            return _ctx.PetTypes.Include(p => p.PetTypePets).Where(p => p.PetTypeId == id).ToList();
         }
 
         public List<PetType> FindPetTypeByName(string name)
         {
-            return (List<PetType>)_ctx.PetTypes.Where(p => p.PetTypeName.ToLower().Contains(name.ToLower()));
+            return _ctx.PetTypes.Where(p => p.PetTypeName.ToLower().Contains(name.ToLower())).ToList();
         }
 
         public List<PetType> GetAllPetTypes()

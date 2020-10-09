@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
 using Petshop.Core.ApplicationService;
 using Petshop.Core.ApplicationService.Impl;
 using Petshop.Core.DomainService;
@@ -26,9 +27,13 @@ namespace Petshop.RestAPI.UI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<PetshopAppContext>(
+            services.AddControllers().AddNewtonsoftJson();
+            /*services.AddDbContext<PetshopAppContext>(
                 opt => opt.UseInMemoryDatabase("PetshopDB")
-                ); ;
+                );*/
+
+            services.AddDbContext<PetshopAppContext>(
+                opt => opt.UseSqlite("Data Source=petshopApp.db"));
 
             services.AddScoped<IOwnerRepository, OwnerRepository>();
             services.AddScoped<IPetRepository, PetRepository>();
@@ -37,6 +42,9 @@ namespace Petshop.RestAPI.UI
             services.AddScoped<IPetTypeRepository, PetTypeRepository>();
             services.AddScoped<IPetTypeService, PetTypeService>();
 
+            services.AddControllers().AddNewtonsoftJson(options => {
+                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            });
 
             services.AddControllers();
             services.AddSwaggerGen();
@@ -53,6 +61,9 @@ namespace Petshop.RestAPI.UI
                 using (var scope = app.ApplicationServices.CreateScope())
                 {
                     var ctx = scope.ServiceProvider.GetService<PetshopAppContext>();
+                    DBSeed.InitData(ctx);
+                    /*ctx.Database.EnsureDeleted();
+                    ctx.Database.EnsureCreated();
                     var owner1 = ctx.Owners.Add(new Owner()
                     {
                         OwnerFirstName = "Anders",
@@ -70,7 +81,7 @@ namespace Petshop.RestAPI.UI
                         OwnerPhoneNr = "+33 8765 5678",
                         OwnerEmail = "densmukke@andeby.dk"
                     }).Entity;
-
+                    ctx.SaveChanges();
                     var dog = ctx.PetTypes.Add(new PetType()
                     {
                         PetTypeName = "Dog"
@@ -80,7 +91,7 @@ namespace Petshop.RestAPI.UI
                     {
                         PetTypeName = "Cat"
                     }).Entity;
-
+                    ctx.SaveChanges();
                     ctx.Pets.Add(new Pet()
                     {
                         PetName = "Olfert",
@@ -92,7 +103,7 @@ namespace Petshop.RestAPI.UI
                         PetPrice = 596,
                         PetOwner = owner1
                     });
-                    ctx.SaveChanges();
+                    ctx.SaveChanges();*/
                 }
                 
             }

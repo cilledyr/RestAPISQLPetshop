@@ -1,4 +1,5 @@
-﻿using Petshop.Core.DomainService;
+﻿using Microsoft.EntityFrameworkCore;
+using Petshop.Core.DomainService;
 using Petshop.Core.Enteties;
 using System;
 using System.Collections.Generic;
@@ -24,12 +25,14 @@ namespace Petshop.Infrastructure.Data.Repositories
 
         public Pet DeletePet(Pet toBeDeletedPet)
         {
-            throw new NotImplementedException();
+            Pet deletedPet = _ctx.Pets.Remove(toBeDeletedPet).Entity;
+            _ctx.SaveChanges();
+            return deletedPet;
         }
 
         public List<Pet> FindPetByID(int theId)
         {
-            return (List<Pet>)_ctx.Pets.Where(p => p.PetId == theId);
+            return _ctx.Pets.Include(p => p.PetType).Include(p => p.PetOwner).Where(p => p.PetId == theId).ToList();
         }
 
         public IEnumerable<Pet> FindPetsByColor(string searchValue)
