@@ -34,7 +34,7 @@ namespace Petshop.Infrastructure.Data.Repositories
 
         public List<Pet> FindAllPetsByType(PetType theType)
         {
-            throw new NotImplementedException();
+            return _ctx.Pets.Where(p => p.PetType == theType).ToList();
         }
 
         public List<PetType> FindPetTypeById(int id)
