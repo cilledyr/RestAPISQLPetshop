@@ -32,9 +32,17 @@ namespace Petshop.Infrastructure.Data.Repositories
             return deletedType;
         }
 
-        public List<Pet> FindAllPetsByType(PetType theType)
+        public List<Pet> FindAllPetsByType(PetType theType, FilterModel filter)
         {
-            return _ctx.Pets.Where(p => p.PetType == theType).ToList();
+            if(filter == null)
+            {
+                return _ctx.Pets.Where(p => p.PetType == theType).ToList();
+            }
+
+            return _ctx.Pets.Where(p => p.PetType == theType)
+                .Skip((filter.CurrentPage - 1) * filter.ItemsPrPage)
+                .Take(filter.ItemsPrPage)
+                .ToList();
         }
 
         public List<PetType> FindPetTypeById(int id)
@@ -59,7 +67,9 @@ namespace Petshop.Infrastructure.Data.Repositories
 
         public PetType UpdatePetType(PetType theNewPetType, PetType theOldPetType)
         {
-            throw new NotImplementedException();
+            var updatedType = _ctx.Update(theNewPetType).Entity;
+            _ctx.SaveChanges();
+            return updatedType;
         }
     }
 }

@@ -18,7 +18,7 @@ namespace Petshop.Core.DomainService
         public Owner UpdatePhoneNrOfOwner(Owner updatedOwner, string updateValue);
         public Owner UpdateEmailOfOwner(Owner updatedOwner, string updateValue);
         public Owner DeleteOwner(Owner toBeDeletedOwner);
-        public List<Pet> FindAllPetsByOwner(Owner theOwner);
+        public List<Pet> FindAllPetsByOwner(Owner theOwner, FilterModel filter = null);
         public IEnumerable<Owner> GetAllOwners();
         public Owner AddNewOwner(Owner theNewOwner);
 

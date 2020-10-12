@@ -3,6 +3,7 @@ using Petshop.Core.DomainService;
 using Petshop.Core.Enteties;
 using System;
 using System.Collections.Generic;
+using System.IO.MemoryMappedFiles;
 using System.Linq;
 using System.Text;
 
@@ -18,6 +19,8 @@ namespace Petshop.Infrastructure.Data.Repositories
         }
         public Pet AddNewPet(Pet theNewPet)
         {
+            _ctx.Attach(theNewPet.PetType);
+            _ctx.Attach(theNewPet.PetOwner);
             var thePet = _ctx.Pets.Add(theNewPet).Entity;
             _ctx.SaveChanges();
             return thePet;
@@ -35,34 +38,67 @@ namespace Petshop.Infrastructure.Data.Repositories
             return _ctx.Pets.Include(p => p.PetType).Include(p => p.PetOwner).Where(p => p.PetId == theId).ToList();
         }
 
-        public IEnumerable<Pet> FindPetsByColor(string searchValue)
+        public IEnumerable<Pet> FindPetsByColor(FilterModel filter)
         {
-            return _ctx.Pets.Where(p => p.PetColor.ToLower().Contains(searchValue.ToLower()));
+            return _ctx.Pets.Where(p => p.PetColor.ToLower().Contains(filter.SearchValue.ToLower()))
+                            .Skip((filter.CurrentPage -1) * filter.ItemsPrPage)
+                            .Take(filter.ItemsPrPage);
         }
 
-        public IEnumerable<Pet> FindPetsByName(string theName)
+        public IEnumerable<Pet> FindPetsByName(string name, FilterModel filter)
         {
-            return _ctx.Pets.Where(p => p.PetName.ToLower().Contains(theName.ToLower()));
+            if(filter == null)
+            {
+                return _ctx.Pets.Where(p => p.PetName.ToLower().Contains(name.ToLower()));
+            }
+
+            return _ctx.Pets.Where(p => p.PetName.ToLower().Contains(name.ToLower()))
+                            .Skip((filter.CurrentPage -1) * filter.ItemsPrPage)
+                            .Take(filter.ItemsPrPage);
         }
 
-        public IEnumerable<Pet> FindPetsByPreviousOwner(string searchValue)
+        public IEnumerable<Pet> FindPetsByPreviousOwner(string searchValue, FilterModel filter)
         {
-            return _ctx.Pets.Where(p => p.PetPreviousOwner.ToLower().Contains(searchValue.ToLower()));
+            if(filter.CurrentPage == 0|| filter.ItemsPrPage == 0)
+            {
+                return _ctx.Pets.Where(p => p.PetPreviousOwner.ToLower().Contains(searchValue.ToLower()));
+            }
+            return _ctx.Pets.Where(p => p.PetPreviousOwner.ToLower().Contains(searchValue.ToLower()))
+                            .Skip((filter.CurrentPage -1) * filter.ItemsPrPage)
+                            .Take(filter.ItemsPrPage);
         }
 
-        public IEnumerable<Pet> FindPetsByPrice(long thePriceValue)
+        public IEnumerable<Pet> FindPetsByPrice(long thePriceValue, FilterModel filter)
         {
-            return _ctx.Pets.Where(pet => pet.PetPrice <= thePriceValue - 10 && pet.PetPrice <= thePriceValue + 10);
+            if(filter.CurrentPage == 0 || filter.ItemsPrPage == 0)
+            {
+                return _ctx.Pets.Where(pet => pet.PetPrice <= thePriceValue - 10 && pet.PetPrice <= thePriceValue + 10);
+            }
+            return _ctx.Pets.Where(pet => pet.PetPrice <= thePriceValue - 10 && pet.PetPrice <= thePriceValue + 10)
+                            .Skip((filter.CurrentPage -1) * filter.ItemsPrPage)
+                            .Take(filter.ItemsPrPage);
         }
 
-        public IEnumerable<Pet> FindPetsBySoldDate(DateTime theSoldValue)
+        public IEnumerable<Pet> FindPetsBySoldDate(DateTime theSoldValue, FilterModel filter)
         {
-            return _ctx.Pets.Where(pet => pet.PetSoldDate.Year == theSoldValue.Year);
+            if(filter.CurrentPage == 0 || filter.ItemsPrPage == 0)
+            {
+                return _ctx.Pets.Where(pet => pet.PetSoldDate.Year == theSoldValue.Year);
+            }
+            return _ctx.Pets.Where(pet => pet.PetSoldDate.Year == theSoldValue.Year)
+                            .Skip((filter.CurrentPage -1) * filter.ItemsPrPage)
+                            .Take(filter.ItemsPrPage);
         }
 
-        public IEnumerable<Pet> GetAllPets()
+        public IEnumerable<Pet> GetAllPets(FilterModel filter)
         {
-            return _ctx.Pets;
+            if(filter == null)
+            {
+                return _ctx.Pets;
+            }
+            return _ctx.Pets
+                .Skip((filter.CurrentPage - 1) * filter.ItemsPrPage)
+                .Take(filter.ItemsPrPage);
         }
 
         public IEnumerable<Pet> GetSortedPets()
@@ -70,9 +106,15 @@ namespace Petshop.Infrastructure.Data.Repositories
             throw new NotImplementedException();
         }
 
-        public IEnumerable<Pet> SearchPetsByBirthYear(DateTime theDateValue)
+        public IEnumerable<Pet> SearchPetsByBirthYear(DateTime theDateValue, FilterModel filter)
         {
-            return _ctx.Pets.Where(pet => pet.PetBirthday.Year == theDateValue.Year);
+            if(filter.CurrentPage == 0 || filter.ItemsPrPage == 0)
+            {
+                return _ctx.Pets.Where(pet => pet.PetBirthday.Year == theDateValue.Year);
+            }
+            return _ctx.Pets.Where(pet => pet.PetBirthday.Year == theDateValue.Year)
+                            .Skip((filter.CurrentPage - 1) * filter.ItemsPrPage)
+                            .Take(filter.ItemsPrPage);
         }
 
         public Pet UpdateBirthdayOfPet(Pet updatedPet, DateTime updateValue)
@@ -85,9 +127,13 @@ namespace Petshop.Infrastructure.Data.Repositories
             throw new NotImplementedException();
         }
 
-        public Pet UpdateFullPet(Pet theOldPet, Pet theNewPet)
+        public Pet UpdateFullPet(Pet theNewPet)
         {
-            throw new NotImplementedException();
+            _ctx.Attach(theNewPet.PetOwner);
+            _ctx.Attach(theNewPet.PetType);
+            var updatedPet = _ctx.Update(theNewPet).Entity;
+            _ctx.SaveChanges();
+            return updatedPet;
         }
 
         public Pet UpdateNameOfPet(Pet updatedPet, string updateValue)

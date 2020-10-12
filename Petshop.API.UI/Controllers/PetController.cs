@@ -29,13 +29,27 @@ namespace Petshop.RestAPI.UI.Controllers
         {
             if(string.IsNullOrEmpty(filter.SearchTerm) && string.IsNullOrEmpty(filter.SearchValue))
             {
-                try
+                if(filter.CurrentPage == 0 && filter.ItemsPrPage == 0)
                 {
-                    return Ok(_petService.GetAllPets());
+                    try
+                    {
+                        return Ok(_petService.GetAllPets());
+                    }
+                    catch (Exception e)
+                    {
+                        return NotFound(e.Message);
+                    }
                 }
-                catch (Exception e)
+                else
                 {
-                    return NotFound(e.Message);
+                    try
+                    {
+                        return Ok(_petService.GetAllFilteredPets(filter));
+                    }
+                    catch(Exception e)
+                    {
+                        return NotFound(e.Message);
+                    }
                 }
             }
             else
@@ -182,7 +196,7 @@ namespace Petshop.RestAPI.UI.Controllers
             try
             {
                 Pet PetToDelete = _petService.DeletePetByID(id);
-                return Accepted(PetToDelete.PetName + " pet has been deleted.");
+                return Accepted("" + PetToDelete.PetName + " has been deleted.");
             }
             catch(Exception e)
             {

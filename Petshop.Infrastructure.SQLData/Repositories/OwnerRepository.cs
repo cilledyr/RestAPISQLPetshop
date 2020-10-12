@@ -31,9 +31,17 @@ namespace Petshop.Infrastructure.Data.Repositories
             return deletedOwner;
         }
 
-        public List<Pet> FindAllPetsByOwner(Owner theOwner)
+        public List<Pet> FindAllPetsByOwner(Owner theOwner, FilterModel filter)
         {
-            return _ctx.Pets.Where(p => p.PetOwner == theOwner).ToList();
+            if(filter == null || filter.ItemsPrPage == 0 || filter.CurrentPage == 0)
+            {
+                return _ctx.Pets.Where(p => p.PetOwner == theOwner).ToList();
+            }
+
+            return _ctx.Pets.Where(p => p.PetOwner == theOwner)
+                            .Skip((filter.CurrentPage -1) * filter.ItemsPrPage)
+                            .Take(filter.ItemsPrPage)
+                            .ToList();
         }
 
         public List<Owner> FindOwner(int theOwnerId)
@@ -88,7 +96,9 @@ namespace Petshop.Infrastructure.Data.Repositories
 
         public Owner UpdateFullOwner(Owner theNewOwner, Owner theOldOwner)
         {
-            throw new NotImplementedException();
+            var updatedOwner = _ctx.Update(theNewOwner).Entity;
+            _ctx.SaveChanges();
+            return updatedOwner;
         }
 
         public Owner UpdateLastNameOfOwner(Owner updatedOwner, string updateValue)

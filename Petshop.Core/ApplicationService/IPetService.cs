@@ -17,6 +17,6 @@ namespace Petshop.Core.ApplicationService
         public List<Pet> GetSortedPets();
         public List<Pet> SearchForPet(FilterModel filter);
 
-        
+        public List<Pet> GetAllFilteredPets(FilterModel filter);
     }
 }

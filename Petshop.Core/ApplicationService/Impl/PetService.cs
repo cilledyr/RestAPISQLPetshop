@@ -106,6 +106,10 @@ namespace Petshop.Core.ApplicationService.Impl
             return _petRepo.FindPetsByName(theName).ToList();
         }
 
+        public List<Pet> GetAllFilteredPets(FilterModel filter)
+        {
+            return _petRepo.GetAllPets(filter).ToList();
+        }
 
         public List<Pet> GetAllPets()
         {
@@ -122,14 +126,14 @@ namespace Petshop.Core.ApplicationService.Impl
         //Searches for pets, for owner and type both id, and name are valid searches.
         public List<Pet> SearchForPet(FilterModel filter)
         {
-            string searchValue = filter.SearchValue;
+            string searchValue = filter.SearchValue.ToLower();
             string toSearchString = filter.SearchTerm.ToLower();
             switch (toSearchString)
             {
                 case "name":
-                    return _petRepo.FindPetsByName(searchValue).ToList();
+                    return _petRepo.FindPetsByName(searchValue, filter).ToList();
                 case "color":
-                    return _petRepo.FindPetsByColor(searchValue).ToList();
+                    return _petRepo.FindPetsByColor(filter).ToList();
                 case "type":
                     int theSearch;
                     List<PetType> thePetType = null;
@@ -142,7 +146,7 @@ namespace Petshop.Core.ApplicationService.Impl
                         }
                         else
                         {
-                            return _petTypeRepo.FindAllPetsByType(thePetType[0]);
+                            return _petTypeRepo.FindAllPetsByType(thePetType[0], filter);
                         }
 
                     }
@@ -155,7 +159,7 @@ namespace Petshop.Core.ApplicationService.Impl
                         }
                         else
                         {
-                            List<Pet> allPetsByType = null;
+                            IEnumerable<Pet> allPetsByType = null;
                             foreach (var petType in thePetType)
                             {
                                 if(allPetsByType == null)
@@ -164,10 +168,14 @@ namespace Petshop.Core.ApplicationService.Impl
                                 }
                                 else
                                 {
-                                    allPetsByType = allPetsByType.Concat(_petTypeRepo.FindAllPetsByType(petType)).ToList();
+                                    allPetsByType = allPetsByType.Concat(_petTypeRepo.FindAllPetsByType(petType));
                                 }
                             }
-                            return allPetsByType;
+                            if(filter.CurrentPage != 0 && filter.ItemsPrPage != 0)
+                            {
+                                allPetsByType = allPetsByType.Skip((filter.CurrentPage - 1) * filter.ItemsPrPage).Take(filter.ItemsPrPage);
+                            }
+                            return allPetsByType.ToList();
                         }
                     }
 
@@ -175,7 +183,7 @@ namespace Petshop.Core.ApplicationService.Impl
                     DateTime theDateValue = DateTime.Now;
                     if (DateTime.TryParse(searchValue, out theDateValue))
                     {
-                        return _petRepo.SearchPetsByBirthYear(theDateValue).ToList() ;
+                        return _petRepo.SearchPetsByBirthYear(theDateValue, filter).ToList() ;
                     }
                     else
                     {
@@ -186,14 +194,14 @@ namespace Petshop.Core.ApplicationService.Impl
                     DateTime theSoldValue = DateTime.Now;
                     if (DateTime.TryParse(searchValue, out theSoldValue))
                     {
-                        return _petRepo.FindPetsBySoldDate(theSoldValue).ToList() ;
+                        return _petRepo.FindPetsBySoldDate(theSoldValue, filter).ToList() ;
                     }
                     else
                     {
                         throw new InvalidDataException(message: "You have not entered a valid date.");
                     }
                 case "previousowner":
-                    return _petRepo.FindPetsByPreviousOwner(searchValue).ToList();
+                    return _petRepo.FindPetsByPreviousOwner(searchValue, filter).ToList();
 
                 case "owner":
                     int theSearchForOwner;
@@ -207,7 +215,7 @@ namespace Petshop.Core.ApplicationService.Impl
                         }
                         else
                         {
-                            return _ownerRepo.FindAllPetsByOwner(thePetOwner[0]);
+                            return _ownerRepo.FindAllPetsByOwner(thePetOwner[0], filter);
                         }
 
                     }
@@ -220,7 +228,7 @@ namespace Petshop.Core.ApplicationService.Impl
                         }
                         else
                         {
-                            List<Pet> allPetsByTheOwners = null;
+                            IEnumerable<Pet> allPetsByTheOwners = null;
                             foreach (var owner in thePetOwner)
                             {
                                 if(allPetsByTheOwners == null)
@@ -229,17 +237,21 @@ namespace Petshop.Core.ApplicationService.Impl
                                 }
                                 else
                                 {
-                                    allPetsByTheOwners = allPetsByTheOwners.Concat(_ownerRepo.FindAllPetsByOwner(owner)).ToList();
+                                    allPetsByTheOwners = allPetsByTheOwners.Concat(_ownerRepo.FindAllPetsByOwner(owner));
                                 }
                             }
-                            return allPetsByTheOwners;
+                            if (filter.CurrentPage != 0 && filter.ItemsPrPage != 0)
+                            {
+                                allPetsByTheOwners = allPetsByTheOwners.Skip((filter.CurrentPage - 1) * filter.ItemsPrPage).Take(filter.ItemsPrPage);
+                            }
+                            return allPetsByTheOwners.ToList();
                         }
                     }
                 case "price":
                     long thePriceValue = 0;
                     if (long.TryParse(searchValue, out thePriceValue))
                     {
-                        return _petRepo.FindPetsByPrice(thePriceValue).ToList();
+                        return _petRepo.FindPetsByPrice(thePriceValue, filter).ToList();
                     }
                     else
                     {
@@ -371,13 +383,13 @@ namespace Petshop.Core.ApplicationService.Impl
         //Updates pet, for type and owner, if Id is set to 0, a new one wil be created from the entered values. Takes a whole pet, returns the upated pet.
         public Pet UpdatePet(Pet thePet)
         {
-            List<Pet> thePets = _petRepo.FindPetByID(thePet.PetId);
+            /*List<Pet> thePets = _petRepo.FindPetByID(thePet.PetId);
             if (thePets.Count !=1 || thePets[0] == null)
             {
                 throw new Exception(message: "I am sorry could not find pet to update.");
             }
             else
-            {
+            {*/
                 if(thePet.PetOwner.OwnerId == 0)
                 {
                     thePet.PetOwner = _ownerRepo.AddNewOwner(thePet.PetOwner);
@@ -398,19 +410,27 @@ namespace Petshop.Core.ApplicationService.Impl
                 if (thePet.PetType.PetTypeId == 0)
                 {
                     theType = _petTypeRepo.FindPetTypeByName(thePet.PetType.PetTypeName);
-
                 }
                 else
                 {
                     theType = _petTypeRepo.FindPetTypeById(thePet.PetType.PetTypeId);
                 }
-                if(theType.Count != 1 || theType == null)
+                if(theType == null && !string.IsNullOrEmpty(thePet.PetType.PetTypeName))
                 {
-                    throw new Exception("Could not find any PetType with these parameters.");
+                    var newType = new PetType() { PetTypeName = thePet.PetType.PetTypeName };
+                    thePet.PetType = _petTypeRepo.AddNewPetType(newType);
+                }
+                else if(theType.Count() == 1)
+                {
+                    thePet.PetType = theType[0];
+                }
+                else
+                {
+                    throw new Exception(message: "Too many petTypes with those parameters found.");
                 }
                 
-                return _petRepo.UpdateFullPet(thePets[0], thePet);
-            }
+                return _petRepo.UpdateFullPet(thePet);
+        //    }
         }
     }
 }
