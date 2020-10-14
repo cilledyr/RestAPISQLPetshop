@@ -28,23 +28,35 @@ namespace Petshop.RestAPI.UI.Controllers
         {
             if(string.IsNullOrEmpty(filter.SearchTerm) && string.IsNullOrEmpty(filter.SearchValue))
             {
-                try
+                if(string.IsNullOrEmpty(filter.SortOrder))
                 {
-                    List<Owner> alltheOwners = _ownerService.GetAllOwners();
-                    if(alltheOwners.Count < 1)
+                    try
                     {
-                        return NotFound("I am sorry, it seems there are no owners.");
+                        List<Owner> alltheOwners = _ownerService.GetAllOwners();
+                        if (alltheOwners.Count < 1)
+                        {
+                            return NotFound("I am sorry, it seems there are no owners.");
+                        }
+                        else
+                        {
+                            return Ok(alltheOwners);
+                        }
+
                     }
-                    else
+                    catch (Exception e)
                     {
-                        return Ok(alltheOwners);
+                        return StatusCode(500, e.Message);
                     }
-                    
                 }
-                catch (Exception e)
+                else if((filter.SortOrder.ToLower().Equals("asc") || filter.SortOrder.ToLower().Equals("desc")) && filter.CurrentPage != 0 && filter.ItemsPrPage != 0)
                 {
-                    return StatusCode(500, e.Message);
+                    return Ok(_ownerService.GetAllSortedOwners(filter));
                 }
+                else
+                {
+                    return BadRequest("SortOrder must be 'asc' or desc' and you need both currentPage and itemsPrPage");
+                }
+                
             }
             else
             {

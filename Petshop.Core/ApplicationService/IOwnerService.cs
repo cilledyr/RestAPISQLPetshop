@@ -16,5 +16,7 @@ namespace Petshop.Core.ApplicationService
         public Owner DeleteOwnerByID(int theId);
         public List<Pet> FindAllPetsByOwner(Owner theOwner);
         public Owner UpdateOwner(Owner theOldOwner);
+
+        public List<Owner> GetAllSortedOwners(FilterModel filter);
     }
 }

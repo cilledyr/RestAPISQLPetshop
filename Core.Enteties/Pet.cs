@@ -14,7 +14,7 @@ namespace Petshop.Core.Enteties
 
         public DateTime PetBirthday { get; set; }
         public DateTime PetSoldDate { get; set; }
-        public string PetColor { get; set; }
+        public List<PetColorPet> PetColor { get; set; }
         public Owner PetOwner { get; set; }
         public string PetPreviousOwner { get; set; }
         public double PetPrice { get; set; }

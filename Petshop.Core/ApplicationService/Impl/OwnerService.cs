@@ -60,6 +60,11 @@ namespace Petshop.Core.ApplicationService.Impl
 
         }
 
+        public List<Owner> GetAllSortedOwners(FilterModel filter)
+        {
+            return _ownerRepo.GetAllOwners(filter).ToList();
+        }
+
         public List<Owner> SearchForOwner(FilterModel filter)
         {
             string searchValue = filter.SearchValue;
@@ -67,14 +72,14 @@ namespace Petshop.Core.ApplicationService.Impl
             switch (searchTerm)
             {
                 case "name":
-                    return _ownerRepo.FindOwnerByName(searchValue).ToList();
+                    return _ownerRepo.FindOwnerByName(searchValue, filter).ToList();
                 case "address":
-                    return _ownerRepo.FindOwnerByAddress(searchValue).ToList();
+                    return _ownerRepo.FindOwnerByAddress(searchValue, filter).ToList();
                 case "phonenr":
-                    return _ownerRepo.FindOwnerByPhonenr(searchValue).ToList();
+                    return _ownerRepo.FindOwnerByPhonenr(searchValue, filter).ToList();
 
                 case "email":
-                    return _ownerRepo.FindOwnerByEmail(searchValue).ToList();
+                    return _ownerRepo.FindOwnerByEmail(searchValue, filter).ToList();
 
                 case "id":
                     int searchId;

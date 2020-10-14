@@ -31,13 +31,31 @@ namespace Petshop.RestAPI.UI.Controllers
             {
                 if(filter.CurrentPage == 0 && filter.ItemsPrPage == 0)
                 {
-                    try
+                    if(string.IsNullOrEmpty(filter.SortOrder))
                     {
-                        return Ok(_petService.GetAllPets());
+                        try
+                        {
+                            return Ok(_petService.GetAllPets());
+                        }
+                        catch (Exception e)
+                        {
+                            return NotFound(e.Message);
+                        }
                     }
-                    catch (Exception e)
+                    else if(filter.SortOrder.ToLower().Equals("asc") || filter.SortOrder.ToLower().Equals("desc"))
                     {
-                        return NotFound(e.Message);
+                        try
+                        {
+                            return Ok(_petService.GetAllFilteredPets(filter));
+                        }
+                        catch(Exception e)
+                        {
+                            return NotFound(e.Message);
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest("You need to enter SortOrder 'asc' or 'desc'");
                     }
                 }
                 else
@@ -109,7 +127,7 @@ namespace Petshop.RestAPI.UI.Controllers
         [HttpPost]
         public ActionResult<Pet> Post([FromBody] Pet thePet)
         {
-            if (string.IsNullOrEmpty(thePet.PetName) || thePet.PetType == null|| string.IsNullOrEmpty(thePet.PetColor) || thePet.PetBirthday == null || thePet.PetSoldDate == null || string.IsNullOrEmpty(thePet.PetPreviousOwner) || thePet.PetOwner == null)
+            if (string.IsNullOrEmpty(thePet.PetName) || thePet.PetType == null|| thePet.PetColor == null || thePet.PetBirthday == null || thePet.PetSoldDate == null || string.IsNullOrEmpty(thePet.PetPreviousOwner) || thePet.PetOwner == null)
             {
                 return BadRequest("You have not entered all the required Pet data");
             }
@@ -121,6 +139,18 @@ namespace Petshop.RestAPI.UI.Controllers
                     return BadRequest("You have not entered all the information for a new PetType, please enter an id of an existing type, or a name for a new one.");
                 }
             }
+            List<PetColorPet> thePetColor = thePet.PetColor;
+            foreach(var color in thePetColor)
+            {
+                if (color.petColorId == 0)
+                {
+                    if (string.IsNullOrEmpty(color.petColor.PetColorName))
+                    {
+                        return BadRequest("You have not entered all the information for a new PetType, please enter an id of an existing type, or a name for a new one.");
+                    }
+                }
+            }
+            
 
             Owner theOwner = thePet.PetOwner;
             if(theOwner.OwnerId == 0)
@@ -171,7 +201,7 @@ namespace Petshop.RestAPI.UI.Controllers
             {
                 return BadRequest("The id's of the Pet must match, and may not be 0.");
             }
-            if (string.IsNullOrEmpty(theUpdatedPet.PetName) || theUpdatedPet.PetType == null || string.IsNullOrEmpty(theUpdatedPet.PetColor) ||
+            if (string.IsNullOrEmpty(theUpdatedPet.PetName) || theUpdatedPet.PetType == null || theUpdatedPet.PetColor == null ||
                 theUpdatedPet.PetBirthday == null || theUpdatedPet.PetSoldDate == null || string.IsNullOrEmpty(theUpdatedPet.PetPreviousOwner) || theUpdatedPet.PetOwner == null ||
                 theUpdatedPet.PetType == null || (theUpdatedPet.PetType.PetTypeId == 0 && string.IsNullOrEmpty(theUpdatedPet.PetType.PetTypeName)))
             {

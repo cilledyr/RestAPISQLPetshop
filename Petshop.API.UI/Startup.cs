@@ -41,6 +41,8 @@ namespace Petshop.RestAPI.UI
             services.AddScoped<IOwnerService, OwnerService>();
             services.AddScoped<IPetTypeRepository, PetTypeRepository>();
             services.AddScoped<IPetTypeService, PetTypeService>();
+            services.AddScoped<IPetColorService, PetColorService>();
+            services.AddScoped<IPetColorRepository, PetColorRepository>();
 
             services.AddControllers().AddNewtonsoftJson(options => {
                 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;

@@ -15,6 +15,8 @@ namespace Petshop.Infrastructure.Data.Repositories
         {
             _ctx = ctx;
         }
+
+       
         public Owner AddNewOwner(Owner theNewOwner)
         {
             var theOwner = _ctx.Owners.Add(theNewOwner).Entity;
@@ -49,14 +51,58 @@ namespace Petshop.Infrastructure.Data.Repositories
             return _ctx.Owners.Where(o => o.OwnerId == theOwnerId).ToList();
         }
 
-        public IEnumerable<Owner> FindOwnerByAddress(string searchValue)
+        public IEnumerable<Owner> FindOwnerByAddress(string searchValue, FilterModel filter)
         {
-            return _ctx.Owners.Where(o => o.OwnerAddress.ToLower().Contains(searchValue.ToLower()));
+            if(filter == null)
+            {
+                return _ctx.Owners.Where(o => o.OwnerAddress.ToLower().Contains(searchValue.ToLower()));
+            }
+            if (filter.CurrentPage == 0 || filter.ItemsPrPage == 0)
+            {
+                return _ctx.Owners.Where(o => o.OwnerAddress.ToLower().Contains(searchValue.ToLower()));
+            }
+            IEnumerable<Owner> theOwners = _ctx.Owners.Where(o => o.OwnerAddress.ToLower().Contains(searchValue.ToLower()))
+                                                .Skip((filter.CurrentPage - 1) * filter.ItemsPrPage)
+                                                .Take(filter.ItemsPrPage);
+            if (string.IsNullOrEmpty(filter.SortOrder))
+            {
+                return theOwners;
+            }
+            else if (filter.SortOrder.ToLower().Equals("desc"))
+            {
+                return theOwners.OrderByDescending(o => o.OwnerAddress);
+            }
+            else
+            {
+                return theOwners.OrderBy(o => o.OwnerAddress);
+            }
         }
 
-        public IEnumerable<Owner> FindOwnerByEmail(string searchValue)
+        public IEnumerable<Owner> FindOwnerByEmail(string searchValue, FilterModel filter)
         {
-            return _ctx.Owners.Where(o => o.OwnerEmail.ToLower().Equals(searchValue.ToLower()));
+            if (filter == null)
+            {
+                return _ctx.Owners.Where(o => o.OwnerEmail.ToLower().Equals(searchValue.ToLower()));
+            }
+            if (filter.CurrentPage == 0 || filter.ItemsPrPage == 0)
+            {
+                return _ctx.Owners.Where(o => o.OwnerEmail.ToLower().Equals(searchValue.ToLower()));
+            }
+            IEnumerable<Owner> theOwners = _ctx.Owners.Where(o => o.OwnerEmail.ToLower().Equals(searchValue.ToLower()))
+                                                .Skip((filter.CurrentPage - 1) * filter.ItemsPrPage)
+                                                .Take(filter.ItemsPrPage);
+            if (string.IsNullOrEmpty(filter.SortOrder))
+            {
+                return theOwners;
+            }
+            else if (filter.SortOrder.ToLower().Equals("desc"))
+            {
+                return theOwners.OrderByDescending(o => o.OwnerEmail);
+            }
+            else
+            {
+                return theOwners.OrderBy(o => o.OwnerEmail);
+            }
         }
 
         public List<Owner> FindOwnerByID(int searchId)
@@ -64,19 +110,85 @@ namespace Petshop.Infrastructure.Data.Repositories
             return _ctx.Owners.Where(o => o.OwnerId == searchId).ToList();
         }
 
-        public IEnumerable<Owner> FindOwnerByName(string searchValue)
+        public IEnumerable<Owner> FindOwnerByName(string searchValue, FilterModel filter)
         {
-            return _ctx.Owners.Where(o => o.OwnerFirstName.ToLower().Contains(searchValue.ToLower()) || o.OwnerLastName.ToLower().Contains(searchValue.ToLower()));
+            
+            if (filter == null)
+            {
+                return _ctx.Owners.Where(o => o.OwnerFirstName.ToLower().Contains(searchValue.ToLower()) || o.OwnerLastName.ToLower().Contains(searchValue.ToLower()));
+            }
+            if (filter.CurrentPage == 0 || filter.ItemsPrPage == 0)
+            {
+                return _ctx.Owners.Where(o => o.OwnerFirstName.ToLower().Contains(searchValue.ToLower()) || o.OwnerLastName.ToLower().Contains(searchValue.ToLower()));
+            }
+            IEnumerable<Owner> theOwners = _ctx.Owners.Where(o => o.OwnerFirstName.ToLower().Contains(searchValue.ToLower()) || o.OwnerLastName.ToLower().Contains(searchValue.ToLower()))
+                                                .Skip((filter.CurrentPage - 1) * filter.ItemsPrPage)
+                                                .Take(filter.ItemsPrPage);
+            if (string.IsNullOrEmpty(filter.SortOrder))
+            {
+                return theOwners;
+            }
+            else if (filter.SortOrder.ToLower().Equals("desc"))
+            {
+                return theOwners.OrderByDescending(o => o.OwnerFirstName);
+            }
+            else
+            {
+                return theOwners.OrderBy(o => o.OwnerFirstName);
+            }
         }
 
-        public IEnumerable<Owner> FindOwnerByPhonenr(string searchValue)
+        public IEnumerable<Owner> FindOwnerByPhonenr(string searchValue, FilterModel filter)
         {
-            return _ctx.Owners.Where(o => o.OwnerPhoneNr.ToLower().Contains(searchValue.ToLower()));
+            if (filter == null)
+            {
+                return _ctx.Owners.Where(o => o.OwnerPhoneNr.ToLower().Contains(searchValue.ToLower()));
+            }
+            if (filter.CurrentPage == 0 || filter.ItemsPrPage == 0)
+            {
+                return _ctx.Owners.Where(o => o.OwnerPhoneNr.ToLower().Contains(searchValue.ToLower()));
+            }
+            IEnumerable<Owner> theOwners = _ctx.Owners.Where(o => o.OwnerPhoneNr.ToLower().Contains(searchValue.ToLower()))
+                                                .Skip((filter.CurrentPage - 1) * filter.ItemsPrPage)
+                                                .Take(filter.ItemsPrPage);
+            if (string.IsNullOrEmpty(filter.SortOrder))
+            {
+                return theOwners;
+            }
+            else if (filter.SortOrder.ToLower().Equals("desc"))
+            {
+                return theOwners.OrderByDescending(o => o.OwnerPhoneNr);
+            }
+            else
+            {
+                return theOwners.OrderBy(o => o.OwnerPhoneNr);
+            }
         }
 
-        public IEnumerable<Owner> GetAllOwners()
+        public IEnumerable<Owner> GetAllOwners(FilterModel filter)
         {
-            return _ctx.Owners;
+            if(filter == null)
+            {
+                return _ctx.Owners;
+            }
+            else
+            {
+                IEnumerable<Owner> theOwners = _ctx.Owners
+                                            .Skip((filter.CurrentPage - 1) * filter.ItemsPrPage)
+                                            .Take(filter.ItemsPrPage);
+                if (string.IsNullOrEmpty(filter.SortOrder))
+                {
+                    return theOwners;
+                }
+                else if (filter.SortOrder.ToLower().Equals("desc"))
+                {
+                    return theOwners.OrderByDescending(o => o.OwnerId);
+                }
+                else
+                {
+                    return theOwners.OrderBy(o => o.OwnerId);
+                }
+            }
         }
 
         public Owner UpdateAddressOfOwner(Owner updatedOwner, string updateValue)

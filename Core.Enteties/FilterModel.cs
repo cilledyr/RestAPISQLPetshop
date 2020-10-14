@@ -11,5 +11,7 @@ namespace Petshop.Core.Enteties
 
         public int CurrentPage { get; set; }
         public int ItemsPrPage { get; set; }
+
+        public string SortOrder { get; set; }
     }
 }

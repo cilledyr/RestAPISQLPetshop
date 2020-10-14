@@ -14,15 +14,17 @@ namespace Petshop.Core.ApplicationService.Impl
         private IPetRepository _petRepo;
         private IOwnerRepository _ownerRepo;
         private IPetTypeRepository _petTypeRepo;
-        public PetService(IPetRepository petRepository, IOwnerRepository ownerRepository, IPetTypeRepository petTypeRepository)
+        private IPetColorRepository _petColorRepo;
+        public PetService(IPetRepository petRepository, IOwnerRepository ownerRepository, IPetTypeRepository petTypeRepository, IPetColorRepository petColorRepository)
         {
             _petRepo = petRepository;
             _ownerRepo = ownerRepository;
             _petTypeRepo = petTypeRepository;
+            _petColorRepo = petColorRepository;
         }
 
 
-        // Adds a new pet, Owner and Type are added unless their ID is given, in which case they are found by Id.
+        // Adds a new pet, Owner, Color and Type are added unless their ID is given, in which case they are found by Id.
         public Pet AddNewPet(Pet theNewPet)
         {
             
@@ -67,6 +69,42 @@ namespace Petshop.Core.ApplicationService.Impl
             {
                 theNewPet.PetOwner = theOwners[0];
             }
+
+            List<PetColor> theColors = null;
+            foreach (var color in theNewPet.PetColor)
+            {
+                PetColor theColor;
+                if (color.petColorId != 0)
+                {
+                    var allColors = _petColorRepo.FindPetColorById(color.petColorId);
+                    if (allColors.Count() != 1)
+                    {
+                        throw new Exception(message: "Wrong nr of id's found");
+                    }
+                    else
+                    {
+                        theColor = allColors[0];
+                    }
+                }
+                else
+                {
+                    theColor = _petColorRepo.AddNewPetColor(color.petColor);
+                }
+                if (theColors == null)
+                {
+                    theColors = new List<PetColor> { theColor };
+                }
+                else
+                {
+                    theColors.Add(theColor);
+                }
+            }
+            List<PetColorPet> thePetColorPets = new List<PetColorPet>();
+            foreach(var color in theColors)
+            {
+                thePetColorPets.Add(new PetColorPet { petColor = color });
+            }
+            theNewPet.PetColor = thePetColorPets;
 
             return  _petRepo.AddNewPet(theNewPet);
 
@@ -428,6 +466,42 @@ namespace Petshop.Core.ApplicationService.Impl
                 {
                     throw new Exception(message: "Too many petTypes with those parameters found.");
                 }
+
+                List<PetColor> theColors = null;
+                foreach(var color in thePet.PetColor)
+                {
+                    PetColor theColor;
+                    if(color.petColorId != 0)
+                    {
+                        var allColors = _petColorRepo.FindPetColorById(color.petColorId);
+                        if(allColors.Count() != 1)
+                        {
+                            throw new Exception(message: "Wrong nr of id's found");
+                        }
+                        else
+                        {
+                            theColor = allColors[0];
+                        }
+                    }
+                    else
+                    {
+                        theColor = _petColorRepo.AddNewPetColor(color.petColor);
+                    }
+                    if(theColors == null)
+                    {
+                        theColors = new List<PetColor> { theColor };
+                    }
+                    else
+                    {
+                        theColors.Add(theColor);
+                    }
+                }
+                List<PetColorPet> thePetColorPets = new List<PetColorPet>();
+                foreach (var color in theColors)
+                {
+                    thePetColorPets.Add(new PetColorPet { petColor = color });
+                }
+                thePet.PetColor = thePetColorPets;
                 
                 return _petRepo.UpdateFullPet(thePet);
         //    }

@@ -147,7 +147,7 @@ namespace Petshop.RestAPI.UI.Controllers
             try
             {
                 _petTypeService.DeletePetType(id);
-                return Accepted($"Successfully deleted pet with the id {id}");
+                return Accepted($"Successfully deleted petType with the id {id}");
             }
             catch(Exception e)
             {
