@@ -102,6 +102,17 @@ namespace Petshop.Infrastructure.Data
                 ctx.Add(pet);
             }
 
+            List<User> allUsers = new List<User>
+            {
+                new User {UserName = "AdminAnn", UserPassword = "Admin1234", UserIsAdmin = true},
+                new User {UserName = "UserUlrik", UserPassword ="User1234", UserIsAdmin = false}
+            };
+
+            foreach (var user in allUsers)
+            {
+                ctx.Add(user);
+            }
+
             ctx.SaveChanges();
         }
     }

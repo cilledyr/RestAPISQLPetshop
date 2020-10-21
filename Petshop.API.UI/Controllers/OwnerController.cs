@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Petshop.Core.ApplicationService;
 using Petshop.Core.Enteties;
@@ -23,6 +24,7 @@ namespace Petshop.RestAPI.UI.Controllers
             _ownerService = ownerService;
         }
         // GET: api/<OwnerController>
+        [Authorize]
         [HttpGet]
         public ActionResult<IEnumerable<Owner>> Get([FromQuery] FilterModel filter)
         {
@@ -87,6 +89,7 @@ namespace Petshop.RestAPI.UI.Controllers
         }
 
         // GET api/<OwnerController>/5
+        [Authorize]
         [HttpGet("{id}")]
         public ActionResult<Owner> Get(int id)
         {
@@ -109,6 +112,7 @@ namespace Petshop.RestAPI.UI.Controllers
         }
 
          // POST api/<OwnerController>
+         [Authorize (Roles = "Administrator")]
         [HttpPost]
         public ActionResult<Owner> Post([FromBody] Owner theOwner)
         {
@@ -127,6 +131,7 @@ namespace Petshop.RestAPI.UI.Controllers
         }
 
         // PUT api/<OwnerController>/5
+        [Authorize(Roles = "Administrator")]
         [HttpPut("{id}")]
         public ActionResult<Owner> Put(int id, [FromBody] Owner theOwner)
         { 
@@ -148,6 +153,7 @@ namespace Petshop.RestAPI.UI.Controllers
             }
         }
         // PUT api/<OwnerController>/5/param
+        [Authorize(Roles = "Administrator")]
         [HttpPut("{id}/param")]
         public ActionResult<Owner> Put(int id, [FromBody] UpdateModel update)
         {
@@ -166,6 +172,7 @@ namespace Petshop.RestAPI.UI.Controllers
         }
 
         // DELETE api/<OwnerController>/5
+        [Authorize(Roles = "Administrator")]
         [HttpDelete("{id}")]
         public ActionResult Delete(int id)
         {

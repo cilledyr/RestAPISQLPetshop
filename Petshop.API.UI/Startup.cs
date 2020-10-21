@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Petshop.Core.ApplicationService;
 using Petshop.Core.ApplicationService.Impl;
@@ -11,6 +13,7 @@ using Petshop.Core.DomainService;
 using Petshop.Core.Enteties;
 using Petshop.Infrastructure.Data;
 using Petshop.Infrastructure.Data.Repositories;
+using Petshop.RestAPI.UI.Helpers;
 using System;
 
 namespace Petshop.RestAPI.UI
@@ -20,6 +23,7 @@ namespace Petshop.RestAPI.UI
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            JwtSecurityKey.SetSecret("kislhfoliernfljsefdælhHUOKG9649");
         }
 
         public IConfiguration Configuration { get; }
@@ -27,6 +31,20 @@ namespace Petshop.RestAPI.UI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateAudience = false,
+                    //ValidateAudience = "PetShopApiClient",
+                    ValidateIssuer = false,
+                    //ValidateIssuer = "PetShopApi",
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = JwtSecurityKey.Key,
+                    ValidateLifetime = true, //validate the expiration and not before values in the token
+                    ClockSkew = TimeSpan.FromMinutes(5) //5 minute tolerance for the expiration date
+                };
+            });
             services.AddControllers().AddNewtonsoftJson();
             /*services.AddDbContext<PetshopAppContext>(
                 opt => opt.UseInMemoryDatabase("PetshopDB")
@@ -43,6 +61,7 @@ namespace Petshop.RestAPI.UI
             services.AddScoped<IPetTypeService, PetTypeService>();
             services.AddScoped<IPetColorService, PetColorService>();
             services.AddScoped<IPetColorRepository, PetColorRepository>();
+            services.AddScoped<IUserRepository, UserRepository > ();
 
             services.AddControllers().AddNewtonsoftJson(options => {
                 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
@@ -126,6 +145,7 @@ namespace Petshop.RestAPI.UI
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
